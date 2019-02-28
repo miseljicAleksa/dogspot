@@ -12,6 +12,7 @@ class UserModel(db.Model):
     firstname = db.Column(db.String(80), nullable=False)
     lastname = db.Column(db.String(80), nullable=False)
     country = db.Column(db.String(80), nullable=False)
+    city = db.Column(db.String(80), nullable=False)
     phone_number = db.Column(db.String(80), nullable=False, unique=True)
     
     items = db.relationship("ItemModel", lazy="dynamic")

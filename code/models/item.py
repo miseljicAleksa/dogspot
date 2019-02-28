@@ -1,32 +1,33 @@
+from typing import List
+
 from db import db
 
 
 class ItemModel(db.Model):
-    __tablename__ = 'items'
+    __tablename__ = "items"
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80))
-    price = db.Column(db.Float(precision=2))
+    name = db.Column(db.String(80), nullable=False)
+    price = db.Column(db.Float(precision=2), nullable=False)
+    gender = db.Column(db.String(80))
+    description = db.Column(db.String(320))
+    age = db.Column(db.String(80))
 
-    store_id = db.Column(db.Integer, db.ForeignKey('stores.id'))
-    store = db.relationship('StoreModel')
-
-    def __init__(self, name, price, store_id):
-        self.name = name
-        self.price = price
-        self.store_id = store_id
-
-    def json(self):
-        return {'name': self.name, 'price': self.price}
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    user = db.relationship("UserModel")
 
     @classmethod
-    def find_by_name(cls, name):
+    def find_by_name(cls, name: str) -> "ItemModel":
         return cls.query.filter_by(name=name).first()
 
-    def save_to_db(self):
+    @classmethod
+    def find_all(cls) -> List["ItemModel"]:
+        return cls.query.all()
+
+    def save_to_db(self) -> None:
         db.session.add(self)
         db.session.commit()
 
-    def delete_from_db(self):
+    def delete_from_db(self) -> None:
         db.session.delete(self)
         db.session.commit()

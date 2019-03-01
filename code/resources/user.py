@@ -64,7 +64,7 @@ class UserLogin(Resource):
     def post(cls):
         try:
             user_json = request.get_json()
-            user_data = user_schema.load(user_json)
+            user_data = user_schema.load(user_json, partial=("email", "city", "country", "firstname", "lastname", "phone_number", ))
         except ValidationError as err:
             return err.messages, 400
 

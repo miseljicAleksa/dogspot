@@ -3,6 +3,8 @@ from models.user import UserModel
 from models.item import ItemModel 
 from schemas.item import ItemSchema 
 
+from marshmallow import Schema, fields
+
 
 class UserSchema(ma.ModelSchema):
     items = ma.Nested(ItemSchema, many = True)
@@ -13,10 +15,7 @@ class UserSchema(ma.ModelSchema):
         dump_only = ("id",)
 
 
-class UserLoginSchem(ma.ModelSchema):
-    items = ma.Nested(ItemSchema, many = True)
-    username = ma.String(required=True)
-    password = ma.String(required=True)
-    class Meta:
-        model = UserModel
- 
+class UserLoginSchema(Schema):
+    password = fields.Str(required=True)
+    username = fields.Str(required=True)
+

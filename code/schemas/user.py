@@ -3,7 +3,7 @@ from models.user import UserModel
 from models.item import ItemModel 
 from schemas.item import ItemSchema 
 
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, pre_dump
 
 
 class UserSchema(ma.ModelSchema):
@@ -12,10 +12,9 @@ class UserSchema(ma.ModelSchema):
     class Meta:
         model = UserModel
         load_only = ("password",)
-        dump_only = ("id",)
+        dump_only = ("id", "activated")
 
-
-class UserLoginSchema(Schema):
-    password = fields.Str(required=True)
-    username = fields.Str(required=True)
-
+    @pre_dump
+    def _pre_dump(self, user: UserModel):
+        user.confirmation = [user.most_recent_confirmation]
+        return user        

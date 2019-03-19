@@ -13,7 +13,7 @@ class ItemModel(db.Model):
     description = db.Column(db.String(320))
     age = db.Column(db.String(80))
 
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     user = db.relationship("UserModel")
 
     @classmethod

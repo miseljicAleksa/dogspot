@@ -15,7 +15,7 @@ NOT_FOUND = "Confirmation reference not found."
 EXPIRED = "The link has expired."
 ALREADY_CONFIRMED = "Registration has already been confirmed."
 RESEND_FAIL = "Internam server error, failed to resend conf email"
-RESEND_SUCCESSFUL = "email conf successfully resent"
+RESEND_SUCCESSFUL = "Email confirmation successfully resent"
 
 confirmation_schema = ConfirmationSchema()
 
@@ -36,8 +36,7 @@ class Confirmation(Resource):
         confirmation.save_to_db()
 
         headers = {"Content-Type":"text/html"}
-        return make_response(
-            render_template("confirmation_page.html", email=confirmation.user.email), 200, headers)
+        return make_response(render_template("confirmation_page.html", email=confirmation.user.email), 200, headers)
 
 
 class ConfirmationByUser(Resource):

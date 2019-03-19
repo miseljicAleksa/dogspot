@@ -1,10 +1,12 @@
 import os
-#ovo se zove blacklist formating 
+ 
 from flask import Flask
 from flask_restful import Api
 from flask_jwt_extended import JWTManager #in deep
 from flask_cors import CORS
-
+from flask_uploads import configure_uploads, patch_request_class
+from flask_migrate import Migrate
+from dotenv import load_dotenv
 
 from db import db
 from ma import ma
@@ -12,18 +14,21 @@ from blacklist import BLACKLIST
 from resources.user import UserRegister, UserLogin, User, TokenRefresh, UserLogout #01101010
 from resources.item import Item, ItemList
 from resources.confirmation import Confirmation, ConfirmationByUser
+from resources.image import ImageUpload, Image, AvatarUpload, Avatar
+from libs.image_helper import IMAGE_SET
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URI")
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["PROPAGATE_EXCEPTIONS"] = True
-app.config["JWT_BLACKLIST_ENABLED"] = True  # enable blacklist feature
-app.config["JWT_BLACKLIST_TOKEN_CHECKS"] = [
-    "access",
-    "refresh",
-]  # allow blacklisting for access and refresh tokens
-app.secret_key = os.environ.get("APP_SECRET_KEY")
+
+load_dotenv(".env", verbose=True)
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///data.db")
+app.config.from_object("default_config")
+app.config.from_envvar("APPLICATION_SETTINGS")
+
+patch_request_class(app, 10 * 1024 * 1024) # 10mb max
+configure_uploads(app, IMAGE_SET)
+
 api = Api(app)
+migrate = Migrate(app, db)
 cors = CORS(app)
 
 
@@ -50,8 +55,12 @@ api.add_resource(TokenRefresh, "/refresh")
 api.add_resource(UserLogout, "/logout")
 api.add_resource(Confirmation, "/user_confirmation/<string:confirmation_id>")
 api.add_resource(ConfirmationByUser, "/confirmation/user/<int:user_id>")
+api.add_resource(ImageUpload, "/upload/image")
+api.add_resource(Image, "/image/<string:filename>")
+api.add_resource(AvatarUpload, "/upload/avatar")
+api.add_resource(Avatar, "/avatar/<int:user_id>")
 
 if __name__ == "__main__":
     db.init_app(app)
     ma.init_app(app)
-    app.run(port=5000, debug=True)
+    app.run(port=5000)

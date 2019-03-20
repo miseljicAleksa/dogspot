@@ -9,3 +9,4 @@ JWT_BLACKLIST_ENABLED = True
 JWT_BLACKLIST_ENABLED = True
 JWT_BLACKLIST_TOKEN_CHECKS = ["access", "refresh"]
 UPLOADED_IMAGES_DEST = os.path.join("static", "images")
+SECRET_KEY = os.getenv("SECRET_KEY")

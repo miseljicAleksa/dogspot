@@ -9,6 +9,10 @@ class ItemModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
     price = db.Column(db.Float(precision=2), nullable=False)
+
+    country = db.Column(db.String(80), nullable=False)
+    city = db.Column(db.String(80), nullable=False)
+
     gender = db.Column(db.String(80))
     description = db.Column(db.String(320))
     age = db.Column(db.String(80))

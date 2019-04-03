@@ -1,5 +1,3 @@
-import os
- 
 from flask import Flask, jsonify
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
@@ -15,8 +13,8 @@ from db import db
 from ma import ma
 from oa import oauth
 from blacklist import BLACKLIST
-from resources.user import UserRegister, UserLogin, User, TokenRefresh, UserLogout #01101010
-from resources.google_login import GoogleLogin
+from resources.user import UserRegister, UserLogin, User, TokenRefresh, UserLogout
+from resources.google_login import GoogleLogin, GoogleAuthorize
 from resources.item import Item, ItemList
 from resources.confirmation import Confirmation, ConfirmationByUser
 from resources.image import ImageUpload, Image, AvatarUpload, Avatar
@@ -34,6 +32,7 @@ api = Api(app)
 migrate = Migrate(app, db)
 jwt = JWTManager(app)
 cors = CORS(app)
+
 
 
 @app.before_first_request
@@ -67,6 +66,7 @@ api.add_resource(Image, "/image/<string:filename>")
 api.add_resource(AvatarUpload, "/upload/avatar")
 api.add_resource(Avatar, "/avatar/<int:user_id>")
 api.add_resource(GoogleLogin, "/login/google")
+api.add_resource(GoogleAuthorize, "/oauth2callback")
 
 if __name__ == "__main__":
     db.init_app(app)

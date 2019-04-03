@@ -18,6 +18,7 @@ from schemas.user import UserSchema
 from blacklist import BLACKLIST
 from libs.mailgun import MailgunException
 from models.confirmation import ConfirmationModel
+from flask_cors import cross_origin
 
 
 USER_ALREADY_EXISTS = "A user with that username already exists."
@@ -38,6 +39,7 @@ user_schema = UserSchema()
 
 class UserRegister(Resource):
     @classmethod
+    @cross_origin()
     def post(cls):
         user_json = request.get_json()
         user = user_schema.load(user_json)

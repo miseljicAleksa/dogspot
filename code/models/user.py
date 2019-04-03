@@ -14,11 +14,11 @@ class UserModel(db.Model):
     username = db.Column(db.String(80), nullable=False, unique=True)
     password = db.Column(db.String(80), nullable=False)
     email = db.Column(db.String(80), nullable=False, unique=True)
-    firstname = db.Column(db.String(80), nullable=False)
-    lastname = db.Column(db.String(80), nullable=False)
-    country = db.Column(db.String(80), nullable=False)
-    city = db.Column(db.String(80), nullable=False)
-    phone_number = db.Column(db.String(80), nullable=False, unique=True)
+    firstname = db.Column(db.String(80))
+    lastname = db.Column(db.String(80))
+    country = db.Column(db.String(80))
+    city = db.Column(db.String(80))
+    phone_number = db.Column(db.String(80), unique=True)
 
     confirmation = db.relationship("ConfirmationModel", lazy="dynamic", cascade="all, delete-orphan") #should add cascade="all, delete-orphan" when add postgreSQL
     

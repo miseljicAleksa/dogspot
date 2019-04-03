@@ -1,16 +1,25 @@
-import os 
+import os
 
+from flask import session, request
 from flask_oauthlib.client import OAuth
 
 oauth = OAuth()
 
-google = oauth.remote_app('google',
-                          base_url='https://www.google.com/accounts/',
-                          authorize_url='https://accounts.google.com/o/oauth2/auth',
-                          request_token_url=None,
-                          request_token_params={'scope': 'https://www.googleapis.com/auth/userinfo.email' },
-                          access_token_url='https://accounts.google.com/o/oauth2/token',
-                          access_token_method='POST',
-                          access_token_params={'grant_type': 'authorization_code'},
-                          consumer_key=os.getenv("GOOGLE_CLIENT_ID"),
-                          consumer_secret=os.getenv("GOOGLE_CLIENT_SECRET"))
+google = oauth.remote_app(
+    'google',
+    consumer_key=os.environ.get('GOOGLE_ID'),
+    consumer_secret=os.environ.get('GOOGLE_SECRET'),
+    request_token_params={
+        'scope': 'email'
+    },
+    base_url='https://www.googleapis.com/oauth2/v1/',
+    request_token_url=None,
+    access_token_method='POST',
+    access_token_url='https://accounts.google.com/o/oauth2/token',
+    authorize_url='https://accounts.google.com/o/oauth2/auth',
+)
+
+
+@google.tokengetter
+def get_google_oauth_token():
+    return session.get('google_token')

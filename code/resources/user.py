@@ -18,7 +18,7 @@ from schemas.user import UserSchema
 from blacklist import BLACKLIST
 from libs.mailgun import MailgunException
 from models.confirmation import ConfirmationModel
-from flask_cors import cross_origin
+from libs import security 
 
 
 USER_ALREADY_EXISTS = "A user with that username already exists."
@@ -26,7 +26,7 @@ EMAIL_ALREADY_EXISTS = "A user with that email already exists."
 USER_NOT_FOUND = "User not found."
 USER_DELETED = "User deleted."
 INVALID_CREDENTIALS = "Invalid credentials!"
-USER_LOGGED_OUT = "User <id={user_id}> successfully logged out."
+USER_LOGGED_OUT = "User successfully logged out."
 NOT_CONFIRMED_ERROR = (
     "You have not confirmed registration, please check your email <{}>."
 )
@@ -39,20 +39,22 @@ user_schema = UserSchema()
 
 class UserRegister(Resource):
     @classmethod
-    @cross_origin()
     def post(cls):
         user_json = request.get_json()
         user = user_schema.load(user_json)
-
+        
+        
         if UserModel.find_by_username(user.username):
             return {"message": USER_ALREADY_EXISTS}, 400
 
         if UserModel.find_by_email(user.email):
             return {"message": EMAIL_ALREADY_EXISTS}, 400
+        
+        hashed_pwd = security.encrypt_password(user.password)
+        user.password = hashed_pwd
 
         try:
             user.save_to_db()
-
             confirmation = ConfirmationModel(user.id)
             confirmation.save_to_db()
             user.send_confirmation_email()
@@ -93,7 +95,7 @@ class UserLogin(Resource):
 
         user = UserModel.find_by_username(user_data.username)
 
-        if user and safe_str_cmp(user_data.password, user.password):
+        if user and security.check_encrypted_password(user_data.password, user.password):
             confirmation = user.most_recent_confirmation
             if confirmation and confirmation.confirmed:
                 access_token = create_access_token(identity=user.id, fresh=True)
@@ -110,10 +112,10 @@ class UserLogout(Resource):
     @classmethod
     @jwt_required
     def post(cls):
-        jti = get_raw_jwt()["jti"]  # jti is "JWT ID", a unique identifier for a JWT.
+        jti = get_raw_jwt()["jti"]  
         user_id = get_jwt_identity()
         BLACKLIST.add(jti)
-        return {"message": USER_LOGGED_OUT.format(user_id)}, 200
+        return {"message": USER_LOGGED_OUT}, 200
 
 
 class TokenRefresh(Resource):
